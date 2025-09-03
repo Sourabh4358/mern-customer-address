@@ -42,29 +42,67 @@ export default function CustomerDetailPage() {
   if (loading) return <p>Loading...</p>;
   if (!customer) return <p>Not found.</p>;
 
-  return (
-    <div>
-      <p><Link to="/">{`← Back`}</Link></p>
-      <h2>
+return (
+  <div className="max-w-2xl mx-auto my-6 px-4">
+    {/* Back Link */}
+    <p className="mb-4">
+      <Link
+        to="/"
+        className="text-blue-600 hover:underline text-sm font-medium"
+      >
+        ← Back
+      </Link>
+    </p>
+
+    {/* Customer Info */}
+    <div className="bg-white border border-gray-200 rounded-lg p-4">
+      <h2 className="text-lg font-semibold text-gray-800">
         {customer.firstName} {customer.lastName}
       </h2>
-      <div>{customer.email} {customer.phone ? `• ${customer.phone}` : ""}</div>
+      <p className="text-sm text-gray-600 mt-1">
+        {customer.email} {customer.phone ? `• ${customer.phone}` : ""}
+      </p>
+    </div>
 
-      <h3 style={{ marginTop: 16 }}>Addresses</h3>
+    {/* Addresses */}
+    <div className="bg-white border border-gray-200 rounded-lg mt-6">
+      <div className="px-4 py-3 border-b border-gray-200">
+        <h3 className="text-base font-medium text-gray-800">Addresses</h3>
+      </div>
       {Array.isArray(customer.addresses) && customer.addresses.length > 0 ? (
-        <ul>
+        <ul className="divide-y divide-gray-200">
           {customer.addresses.map((a) => (
-            <li key={a._id}>
-              {a.street}, {a.city}, {a.state} {a.pinCode} {a.isPrimary ? "— Primary" : ""}
+            <li key={a._id} className="px-4 py-3 text-sm text-gray-700">
+              {a.street}, {a.city}, {a.state} {a.pinCode}{" "}
+              {a.isPrimary && (
+                <span className="ml-1 text-green-600 font-medium">
+                  — Primary
+                </span>
+              )}
             </li>
           ))}
         </ul>
       ) : (
-        <p>No addresses.</p>
+        <p className="px-4 py-3 text-sm text-gray-500 italic">
+          No addresses.
+        </p>
       )}
-
-      <h4 style={{ marginTop: 20 }}>Add another address</h4>
-      <AddressForm onAdd={addAddress} />
     </div>
-  );
+
+    {/* Add New Address */}
+    <div className="bg-white border border-gray-200 rounded-lg mt-6">
+      <div className="px-4 py-3 border-b border-gray-200">
+        <h4 className="text-base font-medium text-gray-800">
+          Add another address
+        </h4>
+      </div>
+      <div className="px-4 py-3">
+        <AddressForm onAdd={addAddress} />
+      </div>
+    </div>
+  </div>
+);
+
+
+
 }

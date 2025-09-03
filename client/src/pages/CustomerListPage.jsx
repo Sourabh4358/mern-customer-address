@@ -38,32 +38,70 @@ export default function CustomerListPage() {
   };
 
   if (loading) return <p>Loading...</p>;
+return (
+  <div className="max-w-3xl mx-auto my-6 px-3">
+    <h2 className="text-xl font-semibold text-gray-800 mb-4">Customers</h2>
 
-  return (
-    <div>
-      <h2>Customers</h2>
-      {customers.length === 0 ? (
-        <p>No customers yet. <Link to="/customers/new">Create one</Link>.</p>
-      ) : (
-        <ul style={{ padding: 0, listStyle: "none" }}>
+    {customers.length === 0 ? (
+      <p className="text-gray-600 text-sm">
+        No customers yet.{" "}
+        <Link
+          to="/customers/new"
+          className="text-blue-600 hover:underline font-medium"
+        >
+          Create one
+        </Link>.
+      </p>
+    ) : (
+      <div className="bg-white border border-gray-200 rounded-md overflow-hidden">
+        <ul className="divide-y divide-gray-200">
           {customers.map((c) => (
-            <li key={c._id} style={{ border: "1px solid #ddd", padding: 12, marginBottom: 10 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+            <li
+              key={c._id}
+              className="px-4 py-3 hover:bg-gray-50 transition-colors"
+            >
+              {/* Top Row: Name & Actions */}
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                 <div>
-                  <strong>{c.firstName} {c.lastName}</strong>
-                  <div>{c.email} {c.phone ? `• ${c.phone}` : ""}</div>
+                  <p className="font-medium text-gray-800">{c.firstName} {c.lastName}</p>
+                  <p className="text-sm text-gray-600">
+                    {c.email} {c.phone ? `• ${c.phone}` : ""}
+                  </p>
                 </div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <Link to={`/customers/${c._id}`}>View</Link>
-                  <button onClick={() => navigate(`/customers/${c._id}/edit`)}>Edit</button>
-                  <button onClick={() => handleDelete(c._id)} style={{ color: "red" }}>Delete</button>
+
+                <div className="flex gap-3 text-sm font-medium mt-2 sm:mt-0">
+                  <Link
+                    to={`/customers/${c._id}`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    View
+                  </Link>
+                  <button
+                    onClick={() => navigate(`/customers/${c._id}/edit`)}
+                    className="text-yellow-600 hover:underline"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(c._id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
+
+              {/* Addresses */}
               {Array.isArray(c.addresses) && c.addresses.length > 0 && (
-                <ul style={{ marginTop: 10 }}>
+                <ul className="mt-2 text-sm text-gray-700 space-y-1">
                   {c.addresses.map((a) => (
-                    <li key={a._id}>
-                      {a.street}, {a.city}, {a.state} {a.pinCode} {a.isPrimary ? "— Primary" : ""}
+                    <li key={a._id} className="pl-3 border-l border-gray-300">
+                      {a.street}, {a.city}, {a.state} {a.pinCode}{" "}
+                      {a.isPrimary && (
+                        <span className="ml-1 text-green-600 font-medium">
+                          — Primary
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -71,7 +109,10 @@ export default function CustomerListPage() {
             </li>
           ))}
         </ul>
-      )}
-    </div>
-  );
+      </div>
+    )}
+  </div>
+);
+
+
 }

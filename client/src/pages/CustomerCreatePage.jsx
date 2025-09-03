@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api"; // axios instance (make sure it's baseURL: http://localhost:5000)
+import { PlusCircle, Trash2, User, Mail, Phone, MapPin } from "lucide-react";
+import api from "../api";
+import './CustomerForm.css'
 
 const emptyAddress = () => ({
   street: "",
@@ -43,12 +45,11 @@ export default function CustomerCreatePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate customer
     if (!customer.firstName.trim() || !customer.email.trim()) {
       alert("First Name and Email are required.");
       return;
     }
-    // Validate addresses
+
     for (const a of addresses) {
       if (!a.street.trim() || !a.city.trim() || !a.state.trim() || !a.pinCode.trim()) {
         alert("Every address needs Street, City, State and Pin Code.");
@@ -59,7 +60,6 @@ export default function CustomerCreatePage() {
     try {
       setSaving(true);
 
-      // 1) Create customer
       const custRes = await api.post("/customers", {
         firstName: customer.firstName.trim(),
         lastName: customer.lastName.trim(),
@@ -68,11 +68,8 @@ export default function CustomerCreatePage() {
       });
 
       const customerId = custRes.data?._id || custRes.data?.id;
-      if (!customerId) {
-        throw new Error("Could not read created customer id from response.");
-      }
+      if (!customerId) throw new Error("Could not read created customer id from response.");
 
-      // 2) Create addresses linked to this customer
       for (const a of addresses) {
         await api.post(`/customers/${customerId}/address`, {
           street: a.street.trim(),
@@ -99,106 +96,134 @@ export default function CustomerCreatePage() {
     }
   };
 
-  return (
-    <div>
-      <h2>Create Customer & Addresses</h2>
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, maxWidth: 640 }}>
-        {/* Customer */}
-        <fieldset style={{ border: "1px solid #ddd", padding: 12 }}>
-          <legend>Customer</legend>
-          <div style={{ display: "grid", gap: 8 }}>
-            <input
-              name="firstName"
-              placeholder="First Name"
-              value={customer.firstName}
-              onChange={handleCustomerChange}
-            />
-            <input
-              name="lastName"
-              placeholder="Last Name"
-              value={customer.lastName}
-              onChange={handleCustomerChange}
-            />
-            <input
-              name="email"
-              placeholder="Email"
-              value={customer.email}
-              onChange={handleCustomerChange}
-            />
-            <input
-              name="phone"
-              placeholder="Phone"
-              value={customer.phone}
-              onChange={handleCustomerChange}
-            />
-          </div>
-        </fieldset>
+return (
+  <div className="max-w-xl mx-auto my-6 p-3">
+    <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 text-center">
+      Create Customer & Addresses
+    </h2>
 
-        {/* Addresses */}
-        <fieldset style={{ border: "1px solid #ddd", padding: 12 }}>
-          <legend>Addresses</legend>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Customer Section */}
+      <fieldset className="border border-gray-300 rounded p-3">
+        <legend className="text-sm font-medium text-gray-700 px-1">
+          Customer
+        </legend>
+        <div className="space-y-2 mt-2">
+          <input
+            name="firstName"
+            placeholder="First Name"
+            value={customer.firstName}
+            onChange={handleCustomerChange}
+            className="w-full p-1.5 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
+          />
+          <input
+            name="lastName"
+            placeholder="Last Name"
+            value={customer.lastName}
+            onChange={handleCustomerChange}
+            className="w-full p-1.5 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            value={customer.email}
+            onChange={handleCustomerChange}
+            className="w-full p-1.5 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
+          />
+          <input
+            name="phone"
+            type="tel"
+            placeholder="Phone"
+            value={customer.phone}
+            onChange={handleCustomerChange}
+            className="w-full p-1.5 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
+          />
+        </div>
+      </fieldset>
 
-          {addresses.map((a) => (
-            <div
-              key={a._key}
-              style={{ border: "1px solid #eee", padding: 10, marginBottom: 10 }}
+      {/* Addresses Section */}
+      <fieldset className="border border-gray-300 rounded p-3">
+        <legend className="text-sm font-medium text-gray-700 px-1">
+          Addresses
+        </legend>
+
+        {addresses.map((a) => (
+          <div
+            key={a._key}
+            className="border border-gray-200 rounded p-2 mt-2 space-y-2"
+          >
+            <input
+              name="street"
+              placeholder="Street"
+              value={a.street}
+              onChange={(e) => handleAddressChange(a._key, e)}
+              className="w-full p-1.5 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
+            />
+            <input
+              name="city"
+              placeholder="City"
+              value={a.city}
+              onChange={(e) => handleAddressChange(a._key, e)}
+              className="w-full p-1.5 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
+            />
+            <input
+              name="state"
+              placeholder="State"
+              value={a.state}
+              onChange={(e) => handleAddressChange(a._key, e)}
+              className="w-full p-1.5 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
+            />
+            <input
+              name="pinCode"
+              type="number"
+              placeholder="Pin Code"
+              value={a.pinCode}
+              onChange={(e) => handleAddressChange(a._key, e)}
+              className="w-full p-1.5 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
+            />
+
+            <label className="flex items-center gap-2 text-gray-700 text-xs">
+              <input
+                type="checkbox"
+                name="isPrimary"
+                checked={a.isPrimary}
+                onChange={(e) => handleAddressChange(a._key, e)}
+                className="h-3 w-3 text-blue-600 border-gray-300 rounded"
+              />
+              Primary
+            </label>
+
+            <button
+              type="button"
+              onClick={() => removeAddressRow(a._key)}
+              disabled={addresses.length === 1}
+              className="text-red-600 text-xs underline disabled:opacity-50"
             >
-              <div style={{ display: "grid", gap: 6 }}>
-                <input
-                  name="street"
-                  placeholder="Street"
-                  value={a.street}
-                  onChange={(e) => handleAddressChange(a._key, e)}
-                />
-                <input
-                  name="city"
-                  placeholder="City"
-                  value={a.city}
-                  onChange={(e) => handleAddressChange(a._key, e)}
-                />
-                <input
-                  name="state"
-                  placeholder="State"
-                  value={a.state}
-                  onChange={(e) => handleAddressChange(a._key, e)}
-                />
-                <input
-                  name="pinCode"
-                  placeholder="Pin Code"
-                  value={a.pinCode}
-                  onChange={(e) => handleAddressChange(a._key, e)}
-                />
-                <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <input
-                    type="checkbox"
-                    name="isPrimary"
-                    checked={a.isPrimary}
-                    onChange={(e) => handleAddressChange(a._key, e)}
-                  />
-                  Primary
-                </label>
-              </div>
-              <div style={{ marginTop: 6 }}>
-                <button
-                  type="button"
-                  onClick={() => removeAddressRow(a._key)}
-                  disabled={addresses.length === 1}
-                >
-                  Remove address
-                </button>
-              </div>
-            </div>
-          ))}
+              Remove
+            </button>
+          </div>
+        ))}
 
-          <button type="button" onClick={addAddressRow}>
-            + Add another address
-          </button>
-        </fieldset>
-
-        <button type="submit" disabled={saving}>
-          {saving ? "Saving..." : "Save Customer & Addresses"}
+        <button
+          type="button"
+          onClick={addAddressRow}
+          className="mt-3 px-3 py-1.5 rounded bg-green-600 text-white hover:bg-green-700 text-sm"
+        >
+          + Add Address
         </button>
-      </form>
-    </div>
-  );
+      </fieldset>
+
+      <button
+        type="submit"
+        disabled={saving}
+        className="w-full py-2 rounded bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+      >
+        {saving ? "Saving..." : "Save"}
+      </button>
+    </form>
+  </div>
+);
+
+
 }
